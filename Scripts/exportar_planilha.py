@@ -2,6 +2,13 @@ import json
 from openpyxl import load_workbook
 
 def Exportar_dados(caminho_arquivo, nome_planilha):
+    """Função que tem como o objetivo extrair dados de uma planilha excel e 
+        transforma-los em JSON.
+
+        Usamos o metodo load_workbook da biblioteca openpyxl
+        Os dados são previamente armazenados em uma lista antes de serem transformados em JSON
+        importamos a biblioteca do Python Json para utilizar o metodo .dumps para transforma-los em json
+    """
     wb = load_workbook(caminho_arquivo, data_only=True)
     ws = wb[nome_planilha] if nome_planilha else wb.active
 
