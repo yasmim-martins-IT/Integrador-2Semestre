@@ -1,7 +1,8 @@
 from django.db import models
 # Create your models here.
 class Ambiente (models.Model) :
-    sig = models.IntegerField(unique=True) #campo unico de identificação para o ambiente
+    #models dos ambientes
+    sig = models.IntegerField(unique=True) #chave unica
     descricao = models.CharField(max_length=200)
     ni = models.CharField(max_length=50)
     responsavel = models.CharField(max_length=100)
@@ -11,10 +12,10 @@ class Ambiente (models.Model) :
 
 
 class Sensores (models.Model) :
-    TIPOS_CHOICES = [('temperatura' , 'Temperatura') , ('umidade', 'Umidade'), ('luminosidade', 'Luminosidade') , ('contador', 'Contador')]
+    TIPOS_CHOICES = [('temperatura' , 'Temperatura') , ('umidade', 'Umidade'), ('luminosidade', 'Luminosidade') , ('contador', 'Contador')] #opções escolha tipo sensor
 
     sensor = models.CharField(max_length=50)
-    tipo = models.CharField(max_length=30,choices=TIPOS_CHOICES)
+    tipo = models.CharField(max_length=30,choices=TIPOS_CHOICES, default='temperatura')
     mac_address = models.CharField(max_length=20 )
     unidade_med = models.CharField(max_length=20)
     latitude = models.CharField(max_length=100)
