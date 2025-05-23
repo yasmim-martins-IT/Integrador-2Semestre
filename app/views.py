@@ -9,6 +9,7 @@ from rest_framework import status
 from Scripts.exportar_planilha import Exportar_dados as exp
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from rest_framework_simplejwt.views  import TokenObtainPairView
 """ 
@@ -19,7 +20,7 @@ from rest_framework_simplejwt.views  import TokenObtainPairView
 """
 #view de login para obtenção do token pelo o usuario
 class LoginView (TokenObtainPairView) :
-    serializer_class =  UserSerializer
+    serializer_class = TokenObtainPairSerializer
 
 #crud Historico:
 @api_view(['POST'])
@@ -76,6 +77,21 @@ def VisualizarHistorico(request) :
         Response(status=status.HTTP_400_BAD_REQUEST)
 #crud Ambientes :
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def visualizarHistoricoPeloID(request , pk ) :
+    if request.method == 'GET' :
+        try:
+            historico = Historico.objects.get(pk = pk)
+
+            serializer = HistoricoSerializer(historico)
+
+            return  Response(serializer, status=status.HTTP_200_OK)
+        except Historico.DoesNotExist :
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    else :
+        Response(status=status.HTTP_400_BAD_REQUEST)
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def CreateAmbiente(request):
@@ -128,6 +144,24 @@ def VisualizarAmbiente(request) :
             return Response(status=status.HTTP_204_NO_CONTENT)
     else :
         Response(status=status.HTTP_400_BAD_REQUEST)
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def visualizarAmbientesPeloSig (request , sig) :
+    if request.method == 'GET' :
+        sig = request.query_params.get('sig')
+        if not sig :
+            return Response({'error' :'Colocar o sig é obrigatório' }, status=status.HTTP_400_BAD_REQUEST)
+        try :
+            ambientes = Ambiente.objects.filter(sig_iexact = sig)
+
+            serializer = Ambiente(ambientes)
+
+            return Response(serializer, status=status.HTTP_200_OK)
+        except Ambiente.DoesNotExist :
+           return Response(status=status.HTTP_404_NOT_FOUND)
+    else :
+        Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 #crud Sensores
 @api_view(['POST'])
@@ -147,7 +181,7 @@ def UpdateSensores(request, pk):
     except Sensores.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     
-    serializer = HistoricoSerializer(sensores, data=request.data, partial=True)
+    serializer = SensorSerializer(sensores, data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -183,6 +217,42 @@ def VisualizarSensores(request) :
     else :
         Response(status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def visualizarSensoresPeloID(request , pk ) :
+    if request.method == 'GET' :
+        try:
+            sensores = Sensores.objects.get(pk = pk)
+
+            serializer = SensorSerializer(sensores)
+
+            return  Response(serializer, status=status.HTTP_200_OK)
+        except Sensores.DoesNotExist :
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    else :
+        Response(status=status.HTTP_400_BAD_REQUEST)
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def visualizarSensoresPeloTipo (request , tipo) :
+    if request.method == 'GET' :
+        tipo = request.query_params.get('tipo')
+        if not tipo :
+            return Response({'error' :'Escolher o tipo é obrigatório' }, status=status.HTTP_400_BAD_REQUEST)
+        try :
+            sensores = Sensores.objects.filter(tipo_iexact = tipo)
+
+            serializer = SensorSerializer(sensores)
+
+            return Response(serializer, status=status.HTTP_200_OK)
+        except Sensores.DoesNotExist :
+           return Response(status=status.HTTP_404_NOT_FOUND)
+    else :
+        Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+            
+
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -190,30 +260,31 @@ def ExtrairXLSXSensores(request ) :
     
     if request.method == 'POST' :
         
-        dados = exp(request.data['caminho_path'] , request.data['nome_planilha'])
-        serializer = SensorSerializer(data = dados.data)
-        serializerHistorico  = HistoricoSerializer(dados = dados.data)
-        if serializer.is_valid() and serializerHistorico.is_valid() :
-            serializer.save()
-            serializerHistorico.save()
+        caminho_path = request.data.get('caminho_path')
+        nome_planilha = request.data.get('nome_planilha')
 
-            return Response(serializer.data , status= status.HTTP_201_CREATED )
-    else :
-        Response(status= status.HTTP_400_BAD_REQUEST)
+    if not caminho_path or not nome_planilha:
+        return Response({"error": "caminho_path e nome_planilha são obrigatórios"}, status=400)
+
+    try:
+        dados_excel = exp(caminho_path, nome_planilha)
+    except Exception as e:
+        return Response({"error": f"Erro ao ler a planilha: {str(e)}"}, status=400)
+    return Response(dados_excel, status=201)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def ExtrairXLSXAmbientes(request ) :
     if request.method == 'POST' :
         
-        dados = exp(request.data['caminho_path'] , request.data['nome_planilha'])
-        serializer = AmbientesSerializer(data = dados.data)
-        serializerHistorico = HistoricoSerializer(dados = dados.data)
-        if serializer.is_valid() and serializerHistorico.is_valid() :
-            serializer.save()
-            serializerHistorico.save()
+        caminho_path = request.data.get('caminho_path')
+        nome_planilha = request.data.get('nome_planilha')
 
+    if not caminho_path or not nome_planilha:
+        return Response({"error": "caminho_path e nome_planilha são obrigatórios"}, status=400)
 
-            return Response(serializer.data , status= status.HTTP_201_CREATED)
-    else :
-        Response(status= status.HTTP_400_BAD_REQUEST)
+    try:
+        dados_excel = exp(caminho_path, nome_planilha)
+    except Exception as e:
+        return Response({"error": f"Erro ao ler a planilha: {str(e)}"}, status=400)
+    return Response(dados_excel, status=201)
