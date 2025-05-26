@@ -10,7 +10,7 @@ from Scripts.exportar_planilha import Exportar_dados as exp
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-
+import sqlite3
 from rest_framework_simplejwt.views  import TokenObtainPairView
 """ 
     Essa página contém as views 
@@ -269,6 +269,7 @@ def visualizarSensoresPeloTipo (request , tipo) :
             
 
 
+#extraindo e importando funções:
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -306,4 +307,63 @@ def ExtrairXLSXAmbientes(request ) :
     return Response(dados_excel, status=201)
 
 @api_view(['GET'])
-@
+@permission_classes([IsAuthenticated])
+def ImportarPlanilhaHistorico(request) :
+    try :
+
+        conn = sqlite3.connect("db.sqlite3")
+
+        df = pd.read_sql_query("SELECT * FROM app_historico", conn)
+
+        df.to_excel("planilhaImportada.xlsx", index=False)  
+
+        df.to_csv("PlanilhaImportada.csv", index=False)
+
+
+        conn.close()
+        
+        return Response({'mesagem':'planilha criada com sucesso'},status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error':str(e)},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def ImportarPlanilhaSensores(request) :
+    try:
+        conn = sqlite3.connect("db.sqlite3")
+
+        df = pd.read_sql_query("SELECT * FROM app_sensores", conn)
+
+        df.to_excel("planilhaImportada.xlsx", index=False)  
+
+        df.to_csv("PlanilhaImportada.csv", index=False)
+
+
+        conn.close()
+        
+        return Response({'mesagem':'planilha criada com sucesso'},status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error':str(e)},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def ImportarPlanilhaAmbientes(request) :
+    try:
+        conn = sqlite3.connect("db.sqlite3")
+
+        df = pd.read_sql_query("SELECT * FROM app_ambiente", conn)
+
+        df.to_excel("planilhaImportada.xlsx", index=False)  
+
+        df.to_csv("PlanilhaImportada.csv", index=False)
+
+
+        conn.close()
+        
+        return Response({'mesagem':'planilha criada com sucesso'},status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error':str(e)},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
