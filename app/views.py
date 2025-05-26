@@ -304,3 +304,6 @@ def ExtrairXLSXAmbientes(request ) :
     except Exception as e:
         return Response({"error": f"Erro ao ler a planilha: {str(e)}"}, status=400)
     return Response(dados_excel, status=201)
+
+@api_view(['GET'])
+@
