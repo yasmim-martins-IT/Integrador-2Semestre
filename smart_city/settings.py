@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt'
 ]
+#configurações do rest_framework para definir as classes de authenticação e permissão padrão
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -49,6 +50,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),}
+#configuração do token como duração de temp de vida e etc
 SIMPLE_JWT = {
     'ACESS_TOKEN_LIFETIME' : timedelta(minutes = 5) ,
     'REFRESH_TOKEN_LIFETIME' : timedelta(days= 1 ),

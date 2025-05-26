@@ -16,6 +16,7 @@ class HistoricoSerializer (serializers.ModelSerializer) :
         model = Historico
         fields = '__all__'
 class UserSerializer (serializers.ModelSerializer) :
+    #serializer para autentificação
     class Meta :
         model = User
         fields = ['username' , 'password'] #pega somente esses campos especificos

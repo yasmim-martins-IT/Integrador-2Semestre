@@ -32,9 +32,15 @@ urlpatterns = [
     #get ambientes com filtros
     path('visualizarAmbiente/<int:sig>', views.visualizarAmbientesPeloSig , name = 'Vizualizar ambiente pelo Sig'),
 
-    #Extrair pdfs
+    #Extrair planilhas
     path('extrairSensores/', views.ExtrairXLSXSensores, name='Extrair Sensores'),
-    path('extrairAmbientes', views.ExtrairXLSXAmbientes, name='Extrair Ambientes') ,
+    path('extrairAmbientes/', views.ExtrairXLSXAmbientes, name='Extrair Ambientes') ,
+    
+    #Importar planilhas
+    path('ImportarPlanilhaHistorico/',views.ImportarPlanilhaHistorico, name = 'Importar Planilha Historico') , 
+    path('ImportarPlanilhaSensores/',views.ImportarPlanilhaSensores, name = 'Importar Planilha Sensores') , 
+    path('ImportarPlanilhaAmbientes/',views.ImportarPlanilhaAmbientes, name = 'Importar Planilha Ambientes') , 
+    
 
 
 ]
