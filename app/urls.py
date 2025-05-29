@@ -13,7 +13,7 @@ urlpatterns = [
     path('deleteHistorico/', views.DeleteHistorico, name='Delete Historico'),
     #get historico com filtros
     path('visualizarHistorico/<int:pk>', views.visualizarHistoricoPeloID, name= 'Visualizer Historico pelo ID'),
-    path('visualizarHistorico/<data : MM-DD-YYYY>', views.VisualizarHistoricoPorDia , name= 'Visualizar o Historico pela data'),
+    path('visualizarHistorico/', views.VisualizarHistoricoPorDia , name= 'Visualizar o Historico pela data'),
 
     #Urls relacionadas aos Sensores
     path('visualizarSensor/',views.VisualizarSensores, name='Visualizar Sensores' ) , 
