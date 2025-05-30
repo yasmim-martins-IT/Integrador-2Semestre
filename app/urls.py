@@ -9,28 +9,28 @@ urlpatterns = [
     #Urls relacionadas ao Historico
     path('visualizarHistorico/',views.VisualizarHistorico, name='Visualizar Historico' ) , 
     path('criarHistorico/', views.CreateHistorico , name='Create Historico' ) ,
-    path('atualizarHistorico/', views.UpdateHistorico, name = 'Update Historico') , 
-    path('deleteHistorico/', views.DeleteHistorico, name='Delete Historico'),
+    path('atualizarHistorico/<int:pk>', views.UpdateHistorico, name = 'Update Historico') , 
+    path('deleteHistorico/<int:pk>', views.DeleteHistorico, name='Delete Historico'),
     #get historico com filtros
     path('visualizarHistorico/<int:pk>', views.visualizarHistoricoPeloID, name= 'Visualizer Historico pelo ID'),
-    path('visualizarHistorico/', views.VisualizarHistoricoPorDia , name= 'Visualizar o Historico pela data'),
+    path('visualizarHistorico/<str:data>/', views.VisualizarHistoricoPorDia , name= 'Visualizar o Historico pela data'),
 
     #Urls relacionadas aos Sensores
     path('visualizarSensor/',views.VisualizarSensores, name='Visualizar Sensores' ) , 
     path('criarSensor/', views.CreateSensor , name='Create Sensor' ) ,
-    path('atualizarSensor/', views.UpdateSensores, name = 'Update Sensores') , 
-    path('deleteSensor/', views.DeleteSensores, name='Delete Sensores'),
+    path('atualizarSensor/<int:pk>', views.UpdateSensores, name = 'Update Sensores') , 
+    path('deleteSensor/<int:pk>', views.DeleteSensores, name='Delete Sensores'),
     #get sensores com filtros
-    path('visualizarSensor/<int:pk>',views.visualizarSensoresPeloID, name = 'visualizar Sensores por ID'), 
-    path('visuslizarSensores/<str:tipo>', views.visualizarSensoresPeloTipo , name = 'visuzalizar sensores pelo tipo'),
+    path('visualizarSensorId/<int:pk>',views.visualizarSensoresPeloID, name = 'visualizar Sensores por ID'), 
+    path('visualizarSensoresTipo/<str:tipo>/', views.visualizarSensoresPeloTipo , name = 'visuzalizar sensores pelo tipo'),
 
     #Urls relacionadas aos Ambientes
     path('visualizarAmbiente/',views.VisualizarAmbiente, name='Visualizar Ambientes' ) , 
     path('criarAmbiente/', views.CreateAmbiente , name='Create Ambiente' ) ,
-    path('atualizarAmbiente/', views.UpdateAmbiente, name = 'Update Ambiente') , 
-    path('deleteAmbiente/', views.DeleteAmbientes, name='Delete ambientes'),
+    path('atualizarAmbiente/<int:pk>', views.UpdateAmbiente, name = 'Update Ambiente') , 
+    path('deleteAmbiente/<int:pk>', views.DeleteAmbientes, name='Delete ambientes'),
     #get ambientes com filtros
-    path('visualizarAmbiente/<int:sig>', views.visualizarAmbientesPeloSig , name = 'Vizualizar ambiente pelo Sig'),
+    path('visualizarAmbiente/<int:sig>/', views.visualizarAmbientesPeloSig , name = 'Vizualizar ambiente pelo Sig'),
 
     #Extrair planilhas
     path('extrairSensores/', views.ExtrairXLSXSensores, name='Extrair Sensores'),

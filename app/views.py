@@ -83,29 +83,27 @@ def visualizarHistoricoPeloID(request , pk ) :
         try:
             historico = Historico.objects.get(pk = pk)
 
-            serializer = HistoricoSerializer(historico, many =  True)
+            serializer = HistoricoSerializer(historico)
 
-            return  Response(serializer, status=status.HTTP_200_OK)
+            return  Response(serializer.data, status=status.HTTP_200_OK)
         except Historico.DoesNotExist :
             return Response(status=status.HTTP_404_NOT_FOUND)
     else :
         Response(status=status.HTTP_400_BAD_REQUEST)
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def VisualizarHistoricoPorDia(request):
-    data = request.query_params.get('data')  #
-
-    if not data:
-        return Response({"error": "a data é obrigatório. Formato: YYYY-MM-DD"}, status=status.HTTP_400_BAD_REQUEST)
-
+def VisualizarHistoricoPorDia(request, data):
     try:
-        historicos = Historico.objects.filter(data_registro__date=data)
+        historicos = Historico.objects.filter(timestamp__date=data)
         serializer = HistoricoSerializer(historicos, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Exception as e:
-        return Response( status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"error": f"Erro: {str(e)}"}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
-#crud Ambientes :
 
 
 @api_view(['POST'])
@@ -153,7 +151,7 @@ def VisualizarAmbiente(request) :
     if request.method == 'GET' :
         try :
             ambientes = Ambiente.objects.all()
-            serializer = AmbientesSerializer(ambientes, many = True)
+            serializer = AmbientesSerializer(ambientes)
 
             return Response(serializer.data , status=status.HTTP_200_OK)
         except Ambiente.DoesNotExist :
@@ -164,15 +162,12 @@ def VisualizarAmbiente(request) :
 @permission_classes([IsAuthenticated])
 def visualizarAmbientesPeloSig (request , sig) :
     if request.method == 'GET' :
-        sig = request.query_params.get('sig')
-        if not sig :
-            return Response({'error' :'Colocar o sig é obrigatório' }, status=status.HTTP_400_BAD_REQUEST)
         try :
-            ambientes = Ambiente.objects.filter(sig_iexact = sig)
+            ambientes = Ambiente.objects.filter(sig= sig)
 
             serializer = AmbientesSerializer(ambientes, many = True)
 
-            return Response(serializer, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except Ambiente.DoesNotExist :
            return Response(status=status.HTTP_404_NOT_FOUND)
     else :
@@ -240,30 +235,28 @@ def visualizarSensoresPeloID(request , pk ) :
         try:
             sensores = Sensores.objects.get(pk = pk)
 
-            serializer = SensorSerializer(sensores , many = True)
+            serializer = SensorSerializer(sensores)
 
-            return  Response(serializer, status=status.HTTP_200_OK)
+            return  Response(serializer.data, status=status.HTTP_200_OK)
         except Sensores.DoesNotExist :
             return Response(status=status.HTTP_404_NOT_FOUND)
     else :
         Response(status=status.HTTP_400_BAD_REQUEST)
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def visualizarSensoresPeloTipo (request , tipo) :
-    if request.method == 'GET' :
-        tipo = request.query_params.get('tipo')
-        if not tipo :
-            return Response({'error' :'Escolher o tipo é obrigatório' }, status=status.HTTP_400_BAD_REQUEST)
-        try :
-            sensores = Sensores.objects.filter(tipo_iexact = tipo)
+def visualizarSensoresPeloTipo(request, tipo):
+    try:
+        sensores = Sensores.objects.filter(tipo__iexact=tipo)
+        if not sensores.exists():
+            return Response({'message': 'Nenhum sensor encontrado para esse tipo.'}, status=status.HTTP_404_NOT_FOUND)
 
-            serializer = SensorSerializer(sensores, many = True)
+        serializer = SensorSerializer(sensores, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-            return Response(serializer, status=status.HTTP_200_OK)
-        except Sensores.DoesNotExist :
-           return Response(status=status.HTTP_404_NOT_FOUND)
-    else :
-        Response(status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
             
