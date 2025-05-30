@@ -315,9 +315,9 @@ def ImportarPlanilhaHistorico(request) :
 
         df = pd.read_sql_query("SELECT * FROM app_historico", conn)
 
-        df.to_excel("planilhaImportada.xlsx", index=False)  
+        df.to_excel("planilhaImportadaHistorico.xlsx", index=False)  
 
-        df.to_csv("PlanilhaImportada.csv", index=False)
+        df.to_csv("PlanilhaImportadaHistorico.csv", index=False)
 
 
         conn.close()
@@ -335,9 +335,9 @@ def ImportarPlanilhaSensores(request) :
 
         df = pd.read_sql_query("SELECT * FROM app_sensores", conn)
 
-        df.to_excel("planilhaImportada.xlsx", index=False)  
+        df.to_excel("planilhaImportadaSensores.xlsx", index=False)  
 
-        df.to_csv("PlanilhaImportada.csv", index=False)
+        df.to_csv("PlanilhaImportadaSensores.csv", index=False)
 
 
         conn.close()
@@ -355,9 +355,9 @@ def ImportarPlanilhaAmbientes(request) :
 
         df = pd.read_sql_query("SELECT * FROM app_ambiente", conn)
 
-        df.to_excel("planilhaImportada.xlsx", index=False)  
+        df.to_excel("planilhaImportadaSensores.xlsx", index=False)  
 
-        df.to_csv("PlanilhaImportada.csv", index=False)
+        df.to_csv("PlanilhaImportadaAmbientes.csv", index=False)
 
 
         conn.close()
