@@ -258,46 +258,124 @@ def visualizarSensoresPeloTipo(request, tipo):
 
 
 
-
-            
-
-
 #extraindo e importando funções:
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def ExtrairXLSXSensores(request ) :
-    
-    if request.method == 'POST' :
-        
-        caminho_path = request.data.get('caminho_path')
-        nome_planilha = request.data.get('nome_planilha')
+def ExtrairXLSXSensores(request):
+    caminho_path = request.data.get('caminho_path')
+    nome_planilha = request.data.get('nome_planilha')
 
     if not caminho_path or not nome_planilha:
-        return Response({"error": "caminho_path e nome_planilha são obrigatórios"}, status=400)
+        return Response(
+            {"error": "Os campos 'caminho_path' e 'nome_planilha' são obrigatórios."},
+            status=400
+        )
+
+    try:
+        dados_excel = exp(caminho_path, nome_planilha)  # Suponha que isso retorna uma lista de dicionários
+    except Exception as e:
+        return Response(
+            {"error": f"Erro ao ler a planilha: {str(e)}"},
+            status=500
+        )
+
+    registros_criados = []
+    try:
+        for item in dados_excel:
+            sensor = Sensores.objects.create(
+                sensor=item.get('sensor'),
+                tipo=item.get('sensor'),
+                mac_address=item.get('mac_address'),
+                unidade_med=item.get('unidade_med'),
+                latitude=item.get('latitude'),
+                longitude=float(item.get('longitude')),
+                status=item.get('status', True)
+            )
+            registros_criados.append({
+                 "id": sensor.id,
+                "sensor": sensor.sensor,
+                "tipo": sensor.sensor,
+                "mac_address": sensor.mac_address,
+                "unidade_med": sensor.unidade_med,
+                "latitude": sensor.latitude,
+                "longitude": sensor.longitude,
+                "status": sensor.status
+            })
+
+    except Exception as e:
+        return Response(
+            {"error": f"Erro ao salvar no banco de dados: {str(e)}"},
+            status=500
+        )
+
+    return Response(
+        {"message": "Dados inseridos com sucesso!", "registros": registros_criados},
+        status=201
+    )
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def ExtrairXLSXAmbientes(request):
+    caminho_path = request.data.get('caminho_path')
+    nome_planilha = request.data.get('nome_planilha')
+
+    if not caminho_path or not nome_planilha:
+        return Response(
+            {"error": "Os campos 'caminho_path' e 'nome_planilha' são obrigatórios."},
+            status=400
+        )
 
     try:
         dados_excel = exp(caminho_path, nome_planilha)
     except Exception as e:
-        return Response({"error": f"Erro ao ler a planilha: {str(e)}"}, status=400)
-    return Response(dados_excel, status=201)
+        return Response(
+            {"error": f"Erro ao ler a planilha: {str(e)}"},
+            status=500
+        )
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def ExtrairXLSXAmbientes(request ) :
-    if request.method == 'POST' :
-        
-        caminho_path = request.data.get('caminho_path')
-        nome_planilha = request.data.get('nome_planilha')
-
-    if not caminho_path or not nome_planilha:
-        return Response({"error": "caminho_path e nome_planilha são obrigatórios"}, status=400)
-
+    registros_criados = []
     try:
-        dados_excel = exp(caminho_path, nome_planilha)
+        for item in dados_excel:
+            # Busca o sensor e o ambiente pelo nome (ou ID, dependendo da sua planilha)
+            sensor_nome = item.get('sensor')
+            ambiente_nome = item.get('ambiente')
+
+            try:
+                sensor = Sensores.objects.get(sensor=sensor_nome)
+            except Sensores.DoesNotExist:
+                return Response({"error": f"Sensor '{sensor_nome}' não encontrado."}, status=400)
+
+            try:
+                ambiente = Ambiente.objects.get(nome=ambiente_nome)
+            except Ambiente.DoesNotExist:
+                return Response({"error": f"Ambiente '{ambiente_nome}' não encontrado."}, status=400)
+
+            historico = Historico.objects.create(
+                sensor=sensor,
+                ambiente=ambiente,
+                valor=float(item.get('valor', 0))
+            )
+
+            registros_criados.append({
+                "id": historico.id,
+                "sensor": sensor.sensor,
+                "ambiente": ambiente.nome,
+                "valor": historico.valor,
+                "timestamp": historico.timestamp
+            })
+
     except Exception as e:
-        return Response({"error": f"Erro ao ler a planilha: {str(e)}"}, status=400)
-    return Response(dados_excel, status=201)
+        return Response(
+            {"error": f"Erro ao salvar no banco de dados: {str(e)}"},
+            status=500
+        )
+
+    return Response(
+        {"message": "Dados de histórico inseridos com sucesso!", "registros": registros_criados},
+        status=201
+    )
+
+
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

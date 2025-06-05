@@ -1,8 +1,11 @@
 from django.urls import path
 from .views import LoginView
 from . import views
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
+    path('api/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),  # para login (token)
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     #Autentificação
     path('login/' , LoginView.as_view(), name = 'Login'),
     
@@ -21,8 +24,8 @@ urlpatterns = [
     path('atualizarSensor/<int:pk>', views.UpdateSensores, name = 'Update Sensores') , 
     path('deleteSensor/<int:pk>', views.DeleteSensores, name='Delete Sensores'),
     #get sensores com filtros
-    path('visualizarSensorId/<int:pk>',views.visualizarSensoresPeloID, name = 'visualizar Sensores por ID'), 
-    path('visualizarSensoresTipo/<str:tipo>/', views.visualizarSensoresPeloTipo , name = 'visuzalizar sensores pelo tipo'),
+    path('visualizarSensorId/<int:pk>',views.visualizarSensoresPeloID, name = 'visualizar_Sensores_por_ID'), 
+    path('visualizarSensoresTipo/<str:tipo>/', views.visualizarSensoresPeloTipo , name = 'visuzalizar_sensores_pelo_tipo'),
 
     #Urls relacionadas aos Ambientes
     path('visualizarAmbiente/',views.VisualizarAmbiente, name='Visualizar Ambientes' ) , 
