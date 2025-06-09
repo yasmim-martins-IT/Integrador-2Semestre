@@ -33,7 +33,7 @@ urlpatterns = [
     path('atualizarAmbiente/<int:pk>', views.UpdateAmbiente, name = 'Update Ambiente') , 
     path('deleteAmbiente/<int:pk>', views.DeleteAmbientes, name='Delete ambientes'),
     #get ambientes com filtros
-    path('visualizarAmbiente/<int:sig>/', views.visualizarAmbientesPeloSig , name = 'Vizualizar ambiente pelo Sig'),
+    path('visualizarAmbientePorSig/<int:sig>/', views.visualizarAmbientesPeloSig , name = 'Vizualizar ambiente pelo Sig'),
 
     #Extrair planilhas
     path('extrairSensores/', views.ExtrairXLSXSensores, name='Extrair Sensores'),
