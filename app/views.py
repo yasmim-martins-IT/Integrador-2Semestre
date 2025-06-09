@@ -151,7 +151,7 @@ def VisualizarAmbiente(request) :
     if request.method == 'GET' :
         try :
             ambientes = Ambiente.objects.all()
-            serializer = AmbientesSerializer(ambientes)
+            serializer = AmbientesSerializer(ambientes , many = True)
 
             return Response(serializer.data , status=status.HTTP_200_OK)
         except Ambiente.DoesNotExist :
