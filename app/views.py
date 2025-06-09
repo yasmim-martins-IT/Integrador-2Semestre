@@ -12,6 +12,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 import sqlite3
 from rest_framework_simplejwt.views  import TokenObtainPairView
+from Scripts.exportar_planilha import Exportar_dados_ambientes as exp2
 """ 
     Essa página contém as views 
     Foi utilizado dois recursos do django para fazer :
@@ -312,6 +313,10 @@ def ExtrairXLSXSensores(request):
         {"message": "Dados inseridos com sucesso!", "registros": registros_criados},
         status=201
     )
+
+
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def ExtrairXLSXAmbientes(request):
@@ -325,7 +330,7 @@ def ExtrairXLSXAmbientes(request):
         )
 
     try:
-        dados_excel = exp(caminho_path, nome_planilha)
+        dados_excel = exp2(caminho_path, nome_planilha)
     except Exception as e:
         return Response(
             {"error": f"Erro ao ler a planilha: {str(e)}"},
@@ -335,32 +340,17 @@ def ExtrairXLSXAmbientes(request):
     registros_criados = []
     try:
         for item in dados_excel:
-            # Busca o sensor e o ambiente pelo nome (ou ID, dependendo da sua planilha)
-            sensor_nome = item.get('sensor')
-            ambiente_nome = item.get('ambiente')
-
-            try:
-                sensor = Sensores.objects.get(sensor=sensor_nome)
-            except Sensores.DoesNotExist:
-                return Response({"error": f"Sensor '{sensor_nome}' não encontrado."}, status=400)
-
-            try:
-                ambiente = Ambiente.objects.get(nome=ambiente_nome)
-            except Ambiente.DoesNotExist:
-                return Response({"error": f"Ambiente '{ambiente_nome}' não encontrado."}, status=400)
-
-            historico = Historico.objects.create(
-                sensor=sensor,
-                ambiente=ambiente,
-                valor=float(item.get('valor', 0))
+            ambiente = Ambiente.objects.create(
+                sig=item.get('sig'),
+                descricao=item.get('descricao'),
+                ni=item.get('ni'),
+                responsavel=item.get('responsavel')
             )
-
             registros_criados.append({
-                "id": historico.id,
-                "sensor": sensor.sensor,
-                "ambiente": ambiente.nome,
-                "valor": historico.valor,
-                "timestamp": historico.timestamp
+                "id": ambiente.id,
+                "sig": ambiente.sig,
+                "descricao": ambiente.descricao,
+                "responsavel": ambiente.responsavel
             })
 
     except Exception as e:
@@ -370,9 +360,10 @@ def ExtrairXLSXAmbientes(request):
         )
 
     return Response(
-        {"message": "Dados de histórico inseridos com sucesso!", "registros": registros_criados},
+        {"message": "Dados inseridos com sucesso!", "registros": registros_criados},
         status=201
     )
+
 
 
 
